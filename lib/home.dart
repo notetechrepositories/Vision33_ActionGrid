@@ -1,5 +1,7 @@
 // ignore: implementation_imports
+import 'package:actiongrid/reportpage.dart';
 import 'package:flutter/material.dart';
+import 'package:focus_detector/focus_detector.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -37,20 +39,30 @@ class _HomeState extends State<Home> {
             child: ListView.separated(
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(3, 5, 3, 5),
-                      child: ListTile(
-                        title: Text(
-                          "Report name",
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => Reports(
+                                    title: "Report name",
+                                  )));
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(3, 5, 3, 5),
+                        child: ListTile(
+                          title: Text(
+                            "Report name",
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
                         ),
                       ),
                     ),
