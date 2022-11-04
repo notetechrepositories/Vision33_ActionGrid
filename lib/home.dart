@@ -1,7 +1,7 @@
 // ignore: implementation_imports
+import 'package:actiongrid/editreport.dart';
 import 'package:actiongrid/reportpage.dart';
 import 'package:flutter/material.dart';
-import 'package:focus_detector/focus_detector.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,6 +11,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final _submitfieldControler = TextEditingController();
+  bool error = false;
   @override
   void initState() {
     print("init");
@@ -44,7 +46,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => Reports(
+                              builder: (_) => Editreport(
                                     title: "Report name",
                                   )));
                     },
@@ -53,8 +55,8 @@ class _HomeState extends State<Home> {
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                       color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(3, 5, 3, 5),
+                      child: const Padding(
+                        padding: EdgeInsets.fromLTRB(3, 5, 3, 5),
                         child: ListTile(
                           title: Text(
                             "Report name",
@@ -82,69 +84,94 @@ class _HomeState extends State<Home> {
   }
 
   howDataAlert() {
+    error = false;
+    _submitfieldControler.text = "";
     showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(
-                  20.0,
+          return StatefulBuilder(builder: ((context, setState) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(
+                    20.0,
+                  ),
                 ),
               ),
-            ),
-            contentPadding: EdgeInsets.only(
-              top: 10.0,
-            ),
-            title: Text(
-              "Create Report",
-              style: TextStyle(fontSize: 24.0, color: Color(0xFFaa0e3f)),
-            ),
-            content: Container(
-              height: 200,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Mension Your Report name",
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: const TextField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Enter name here',
-                            labelText: 'Name'),
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 60,
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Color(0xFF047CB7),
+              contentPadding: const EdgeInsets.only(
+                top: 10.0,
+              ),
+              title: const Text(
+                "Create Report",
+                style: TextStyle(fontSize: 24.0, color: Color(0xFFaa0e3f)),
+              ),
+              content: SizedBox(
+                height: 220,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          "Mention Your Report name",
                         ),
-                        child: Text("Submit",
-                            style: TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.bold)),
                       ),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _submitfieldControler,
+                          onChanged: (text) {
+                            if (text.isNotEmpty) {
+                              setState(() {
+                                error = false;
+                              });
+                            }
+                          },
+                          decoration: InputDecoration(
+                              errorText:
+                                  error ? "Please enter report name" : null,
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 0.0),
+                              ),
+                              border: const OutlineInputBorder(),
+                              hintText: 'Enter name here',
+                              labelText: 'Name'),
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 60,
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_submitfieldControler.text.isEmpty) {
+                              setState(() {
+                                print("true");
+                                error = true;
+                              });
+                            } else {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Color(0xFF047CB7),
+                          ),
+                          child: const Text("Submit",
+                              style: TextStyle(
+                                  fontSize: 18.0, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
+            );
+          }));
         });
   }
 }
