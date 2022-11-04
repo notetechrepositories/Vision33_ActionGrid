@@ -1,0 +1,74 @@
+
+  [
+    {
+    "column": "OrderID",
+    "format": "string",
+    "groupByHeader": false,
+    "allowUserUpdate": true,
+    "dropdown": false,
+    "values": []
+  },
+  {
+    "column": "ItemType",
+    "format": "string",
+    "groupByHeader": false,
+    "allowUserUpdate": true,
+    "dropdown": true,
+    "values": [
+      "Cosmetics",
+      "Snacks",
+      "Personal Care",
+      "Office Supplies",
+      "Meat",
+      "Household",
+      "Clothes",
+      "Baby Food"
+    ]
+  },
+  {
+    "column": "SalesChannel",
+    "format": "string",
+    "groupByHeader": false,
+    "allowUserUpdate": true,
+    "dropdown": true,
+    "values": [
+      "online",
+      "offline"
+    ]
+  },
+  {
+    "column": "Country",
+    "format": "string",
+    "groupByHeader": false,
+    "allowUserUpdate": true,
+    "dropdown": true,
+    "values": [
+      "Bosnia and Herzegovina",
+      "Estonia",
+      "Germany",
+      "Iceland",
+      "Madagascar",
+      "Malawi",
+      "Mauritius",
+      "Montenegro",
+      "Serbia",
+      "Seychelles"
+    ]
+  },
+  {
+    "column": "OrderPriority",
+    "format": "string",
+    "groupByHeader": false,
+    "allowUserUpdate": true,
+    "dropdown": false,
+    "values": []
+  },
+  {
+    "column": "OrderDate",
+    "format": "date",
+    "groupByHeader": false,
+    "allowUserUpdate": true,
+    "dropdown": false,
+    "values": []
+  }
+]
