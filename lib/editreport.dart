@@ -1,9 +1,14 @@
 import 'package:actiongrid/Utilities/Models/model.dart';
+import 'package:actiongrid/shared_preference_util.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'constants.dart';
 
 class Editreport extends StatefulWidget {
+  List<Headers> headers;
   String? title;
-  Editreport({super.key, required this.title});
+  Editreport({super.key, required this.title, required this.headers});
 
   @override
   State<Editreport> createState() => _EditreportState();
@@ -17,7 +22,7 @@ class _EditreportState extends State<Editreport> {
         appBar: AppBar(title: Text(widget.title!)),
         body: Stack(
           children: [
-            Container(
+            SizedBox(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(30, 30, 30, 15),
                 child: SingleChildScrollView(
@@ -74,24 +79,47 @@ class _EditreportState extends State<Editreport> {
 
   List<Widget> _getListings() {
     List<Widget> listings = <Widget>[];
-    listings.add(getTextField("Order ID"));
-    listings.add(
-      const SizedBox(
-        height: 15,
-      ),
-    );
 
-    listings.add(getDropdown("Order Date"));
-    listings.add(
-      const SizedBox(
-        height: 15,
-      ),
-    );
-    listings.add(getdateTextField("Order Date"));
+    for (int i = 0; i < widget.headers.length; i++) {
+      if (widget.headers[i].format == "string" &&
+          widget.headers[i].dropdown! == false) {
+        listings.add(getTextField(widget.headers[i].column!));
+      } else if (widget.headers[i].format == "string" &&
+          widget.headers[i].dropdown!) {
+        listings.add(
+            getDropdown(widget.headers[i].column!, widget.headers[i].values!));
+        //listings.add(getDropdown(widget.headers[i].column!, widget.headers[i].values!));
+      }
+
+      listings.add(
+        const SizedBox(
+          height: 15,
+        ),
+      );
+    }
     return listings;
   }
 
-  Widget getDropdown(String field) {
+  // List<Widget> listings = <Widget>[];
+  // listings.add(getTextField("Order ID"));
+  // listings.add(
+  //   const SizedBox(
+  //     height: 15,
+  //   ),
+  // );
+
+  // listings.add(
+  //   getDropdown("Order Date", ["data"]),
+  // );
+  // listings.add(
+  //   const SizedBox(
+  //     height: 15,
+  //   ),
+  // );
+  // listings.add(getdateTextField("Order Date"));
+  // return listings;
+
+  Widget getDropdown(String field, List<String> values) {
     return DropdownButtonFormField(
       decoration: InputDecoration(
           border: OutlineInputBorder(
@@ -111,9 +139,8 @@ class _EditreportState extends State<Editreport> {
           labelText: field,
           labelStyle: TextStyle(color: Color(0xFF047CB7)),
           hintText: field),
-      value: field,
-      items:
-          ["Order Date", "hai"].map<DropdownMenuItem<String>>((String value) {
+      value: values[0],
+      items: values.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
@@ -126,31 +153,6 @@ class _EditreportState extends State<Editreport> {
       },
     );
   }
-  // List<Widget> _getListings(List<Headers>? header) {
-  //   List<Widget> listings = <Widget>[];
-  //   listings.add(getTextField("Order ID"));
-  //   if (header != null && header.isNotEmpty) {
-  //     int i = 0;
-  //     for (i = 0; i < header.length; i++) {
-  //       if (header[i].format == "string" && header[i].dropdown!) {
-  //       } else if (header[i].format == "string" && header[i].dropdown!) {}
-
-  //       listings.add(
-  //         const SizedBox(
-  //           height: 12,
-  //         ),
-  //       );
-  //     }
-  //   }
-  //   if (listings.isNotEmpty) {
-  //     listings.add(
-  //       const SizedBox(
-  //         height: 12,
-  //       ),
-  //     );
-  //   }
-  //   return listings;
-  // }
 
   Widget getTextField(String field) {
     return TextFormField(
@@ -189,7 +191,7 @@ class _EditreportState extends State<Editreport> {
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide(color: Color(0xFF047CB7), width: 0.0),
+            borderSide: const BorderSide(color: Color(0xFF047CB7), width: 0.0),
           ),
           hintText: field,
           labelText: field),

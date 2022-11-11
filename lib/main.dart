@@ -1,3 +1,4 @@
+import 'package:actiongrid/home.dart';
 import 'package:actiongrid/spalsh.dart';
 import 'package:flutter/material.dart';
 
@@ -32,6 +33,6 @@ class _MyAppState extends State<MyApp> {
             fontFamily: 'Roboto',
             visualDensity: VisualDensity.adaptivePlatformDensity,
             primarySwatch: MaterialColor(0xFF047CB7, colord)),
-        home: Splash());
+        home: Home());
   }
 }

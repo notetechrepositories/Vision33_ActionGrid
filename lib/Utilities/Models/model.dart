@@ -35,3 +35,40 @@ class Reports {
     reportName = json['reportName'];
   }
 }
+
+class Tabledata {
+  int? orderId;
+  String? itemType;
+  String? salesChannel;
+  String? country;
+  String? orderPriority;
+  String? orderDate;
+
+  Tabledata(
+      {this.orderId,
+      this.itemType,
+      this.salesChannel,
+      this.country,
+      this.orderPriority,
+      this.orderDate});
+
+  Tabledata.fromJson(Map<String, dynamic> json) {
+    orderId = json['Order Id'];
+    itemType = json['Item Type'];
+    salesChannel = json['Sales Channel'];
+    country = json['Country'];
+    orderPriority = json['Order Priority'];
+    orderDate = json['Order Date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Order Id'] = this.orderId;
+    data['Item Type'] = this.itemType;
+    data['Sales Channel'] = this.salesChannel;
+    data['Country'] = this.country;
+    data['Order Priority'] = this.orderPriority;
+    data['Order Date'] = this.orderDate;
+    return data;
+  }
+}

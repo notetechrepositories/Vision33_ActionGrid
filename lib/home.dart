@@ -1,7 +1,13 @@
 // ignore: implementation_imports
+import 'package:actiongrid/Utilis.dart';
 import 'package:actiongrid/editreport.dart';
-import 'package:actiongrid/reportpage.dart';
+import 'package:actiongrid/shared_preference_util.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'Utilities/Models/model.dart';
+import 'constants.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,12 +17,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool _isLoading = false;
+  List<Reports> reports = [];
   final _submitfieldControler = TextEditingController();
   bool error = false;
   @override
   void initState() {
-    print("init");
     super.initState();
+    getreportlist();
   }
 
   @override
@@ -30,56 +38,73 @@ class _HomeState extends State<Home> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text("Salt Box "),
+        title: const Text("Salt Box"),
       ),
-      body: Container(
-        color: const Color(0xFFD3D3D3),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-            child: ListView.separated(
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => Editreport(
-                                    title: "Report name",
-                                  )));
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      color: Colors.white,
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(3, 5, 3, 5),
-                        child: ListTile(
-                          title: Text(
-                            "Report name",
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.red,
+              ),
+            )
+          : Container(
+              color: const Color(0xFFD3D3D3),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  child: ListView.separated(
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            Future<String> accesspoint =
+                                Preference.getStringItem(Constants.column_data);
+                            accesspoint.then((data) async {
+                              if (data.isNotEmpty) {
+                                List columns = json.decode(data);
+                                List<Headers> headers = columns
+                                    .map((job) => Headers.fromJson(job))
+                                    .toList();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => Editreport(
+                                              title: "Report name",
+                                              headers: headers,
+                                            )));
+                              }
+                            }, onError: (e) {});
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(3, 5, 3, 5),
+                              child: ListTile(
+                                title: Text(
+                                  reports[index].reportName ?? "",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const Divider(
-                    height: 5,
-                    color: Colors.transparent,
-                  );
-                },
-                itemCount: 10),
-          ),
-        ),
-      ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return const Divider(
+                          height: 5,
+                          color: Colors.transparent,
+                        );
+                      },
+                      itemCount: reports.length),
+                ),
+              ),
+            ),
     );
   }
 
@@ -173,5 +198,81 @@ class _HomeState extends State<Home> {
             );
           }));
         });
+  }
+
+  void _showToast(String msg) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        duration: Duration(milliseconds: 2000),
+        content: Text(msg),
+      ),
+    );
+  }
+
+  //Api
+  getreportlist() async {
+    Utils.checkInternetConnection().then((connectionResult) async {
+      if (connectionResult) {
+        setState(() {
+          _isLoading = true;
+        });
+
+        String url = Constants.base_url + 'report_list';
+
+        var uri = Uri.parse(url);
+
+        final response = await http.get(
+          uri,
+          headers: <String, String>{
+            'Content-Type': "application/json",
+          },
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        if (response.statusCode == 200) {
+          List parsed = json.decode(response.body);
+          reports = parsed.map((job) => Reports.fromJson(job)).toList();
+        } else {
+          _showToast("Host Unreachable, try again later");
+        }
+      } else {
+        _showToast("No internet connection available");
+      }
+    });
+  }
+
+  createReport(String reportname, BuildContext context) async {
+    Utils.checkInternetConnection().then((connectionResult) async {
+      if (connectionResult) {
+        setState(() {
+          //_isapply = true;
+        });
+
+        String url = Constants.base_url + 'create_report/add_new';
+
+        var uri = Uri.parse(url);
+        Map report = {"reportName": reportname};
+        var body = jsonEncode(report);
+        final response = await http.post(uri,
+            headers: <String, String>{
+              'Content-Type': "application/json",
+            },
+            body: body);
+        setState(() {
+          //_isapply = false;
+        });
+
+        if (response.statusCode == 201) {
+          _showToast("Report created successfully");
+          getreportlist();
+        } else {
+          _showToast("Host Unreachable, try again later");
+        }
+      } else {
+        _showToast("No internet connection available");
+      }
+    });
   }
 }
