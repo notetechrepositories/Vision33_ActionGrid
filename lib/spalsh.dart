@@ -18,7 +18,6 @@ class _SplashState extends State<Splash> {
   bool _isLoading = false;
   void initState() {
     super.initState();
-
     configuration();
   }
 

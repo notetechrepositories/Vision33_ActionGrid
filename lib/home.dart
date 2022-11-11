@@ -18,6 +18,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool _isLoading = false;
+  bool _isapply = true;
   List<Reports> reports = [];
   final _submitfieldControler = TextEditingController();
   bool error = false;
@@ -43,7 +44,7 @@ class _HomeState extends State<Home> {
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                color: Colors.red,
+                color: Color(0xFFaa0e3f),
               ),
             )
           : Container(
@@ -81,11 +82,11 @@ class _HomeState extends State<Home> {
                             ),
                             color: Colors.white,
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(3, 5, 3, 5),
+                              padding: const EdgeInsets.fromLTRB(3, 5, 3, 5),
                               child: ListTile(
                                 title: Text(
                                   reports[index].reportName ?? "",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black),
@@ -172,24 +173,31 @@ class _HomeState extends State<Home> {
                         width: double.infinity,
                         height: 60,
                         padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (_submitfieldControler.text.isEmpty) {
-                              setState(() {
-                                print("true");
-                                error = true;
-                              });
-                            } else {
-                              Navigator.of(context).pop();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Color(0xFF047CB7),
-                          ),
-                          child: const Text("Submit",
-                              style: TextStyle(
-                                  fontSize: 18.0, fontWeight: FontWeight.bold)),
-                        ),
+                        child: _isapply
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF047CB7),
+                                ),
+                              )
+                            : ElevatedButton(
+                                onPressed: () {
+                                  if (_submitfieldControler.text.isEmpty) {
+                                    setState(() {
+                                      print("true");
+                                      error = true;
+                                    });
+                                  } else {
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color(0xFF047CB7),
+                                ),
+                                child: const Text("Submit",
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold)),
+                              ),
                       ),
                     ],
                   ),
@@ -247,7 +255,7 @@ class _HomeState extends State<Home> {
     Utils.checkInternetConnection().then((connectionResult) async {
       if (connectionResult) {
         setState(() {
-          //_isapply = true;
+          _isapply = true;
         });
 
         String url = Constants.base_url + 'create_report/add_new';
@@ -261,7 +269,7 @@ class _HomeState extends State<Home> {
             },
             body: body);
         setState(() {
-          //_isapply = false;
+          _isapply = false;
         });
 
         if (response.statusCode == 201) {
