@@ -46,7 +46,7 @@ class _SplashState extends State<Splash> {
           ),
           Visibility(
             visible: _isLoading,
-            child: CircularProgressIndicator(
+            child: const CircularProgressIndicator(
               color: Color(0xFF047CB7),
             ),
           )

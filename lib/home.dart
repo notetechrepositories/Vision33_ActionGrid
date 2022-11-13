@@ -1,6 +1,7 @@
 // ignore: implementation_imports
 import 'package:actiongrid/Utilis.dart';
 import 'package:actiongrid/editreport.dart';
+import 'package:actiongrid/report.dart';
 import 'package:actiongrid/shared_preference_util.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -18,7 +19,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool _isLoading = false;
-  bool _isapply = true;
+  bool _isapply = false;
   List<Reports> reports = [];
   final _submitfieldControler = TextEditingController();
   bool error = false;
@@ -69,8 +70,9 @@ class _HomeState extends State<Home> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => Editreport(
-                                              title: "Report name",
+                                        builder: (_) => Reportpage(
+                                              title: reports[index].reportName,
+                                              id: reports[index].id.toString(),
                                               headers: headers,
                                             )));
                               }
@@ -187,7 +189,10 @@ class _HomeState extends State<Home> {
                                       error = true;
                                     });
                                   } else {
-                                    Navigator.of(context).pop();
+                                    setState(() {
+                                      createReport(
+                                          _submitfieldControler.text, context);
+                                    });
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -268,12 +273,17 @@ class _HomeState extends State<Home> {
               'Content-Type': "application/json",
             },
             body: body);
-        setState(() {
-          _isapply = false;
-        });
+        setState(() {});
 
         if (response.statusCode == 201) {
           _showToast("Report created successfully");
+
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _isapply = false;
+            setState(() {
+              Navigator.of(context).pop();
+            });
+          });
           getreportlist();
         } else {
           _showToast("Host Unreachable, try again later");
