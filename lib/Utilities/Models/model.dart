@@ -37,38 +37,42 @@ class Reports {
 }
 
 class Tabledata {
-  int? orderId;
+  String? orderID;
   String? itemType;
+  String? region;
   String? salesChannel;
   String? country;
   String? orderPriority;
   String? orderDate;
 
   Tabledata(
-      {this.orderId,
+      {this.orderID,
       this.itemType,
+      this.region,
       this.salesChannel,
       this.country,
       this.orderPriority,
       this.orderDate});
 
   Tabledata.fromJson(Map<String, dynamic> json) {
-    orderId = json['Order Id'];
-    itemType = json['Item Type'];
-    salesChannel = json['Sales Channel'];
+    orderID = json['OrderID'].toString();
+    itemType = json['ItemType'];
+    region = json['Region'];
+    salesChannel = json['SalesChannel'];
     country = json['Country'];
-    orderPriority = json['Order Priority'];
-    orderDate = json['Order Date'];
+    orderPriority = json['OrderPriority'];
+    orderDate = json['OrderDate'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['Order Id'] = this.orderId;
-    data['Item Type'] = this.itemType;
-    data['Sales Channel'] = this.salesChannel;
+    data['OrderID'] = this.orderID;
+    data['ItemType'] = this.itemType;
+    data['Region'] = this.region;
+    data['SalesChannel'] = this.salesChannel;
     data['Country'] = this.country;
-    data['Order Priority'] = this.orderPriority;
-    data['Order Date'] = this.orderDate;
+    data['OrderPriority'] = this.orderPriority;
+    data['OrderDate'] = this.orderDate;
     return data;
   }
 }

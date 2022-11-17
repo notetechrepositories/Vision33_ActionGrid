@@ -73,7 +73,7 @@ class _SplashState extends State<Splash> {
           _isLoading = true;
         });
 
-        String url = Constants.base_url + 'report_config/33';
+        String url = Constants.base_url + 'report_config';
 
         var uri = Uri.parse(url);
 

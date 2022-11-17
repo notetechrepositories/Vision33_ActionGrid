@@ -33,6 +33,6 @@ class _MyAppState extends State<MyApp> {
             fontFamily: 'Roboto',
             visualDensity: VisualDensity.adaptivePlatformDensity,
             primarySwatch: MaterialColor(0xFF047CB7, colord)),
-        home: Home());
+        home: Splash());
   }
 }
