@@ -40,7 +40,13 @@ class _HomeState extends State<Home> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text("Salt Box"),
+        backgroundColor: Colors.white,
+        title: Image.asset(
+          "assests/images/Saltbox_title.png",
+          height: 50,
+          width: 100,
+          fit: BoxFit.contain,
+        ),
       ),
       body: _isLoading
           ? const Center(
@@ -50,6 +56,7 @@ class _HomeState extends State<Home> {
             )
           : Container(
               color: const Color(0xFFD3D3D3),
+              height: MediaQuery.of(context).size.height,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Padding(

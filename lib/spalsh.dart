@@ -38,7 +38,7 @@ class _SplashState extends State<Splash> {
             width: MediaQuery.of(context).size.height * 0.2,
             height: MediaQuery.of(context).size.height * 0.2,
             child: Image.asset(
-              'assets/images/logo.png',
+              'assests/images/Saltbox_icon.png',
             ),
           ),
           const SizedBox(
@@ -93,10 +93,11 @@ class _SplashState extends State<Splash> {
           Preference.setStringItem(Constants.column_data, json.encode(parsed));
           List headers = parsed.map((job) => Headers.fromJson(job)).toList();
           print(headers);
-
-          setState(() {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (_) => const Home()));
+          Future.delayed(const Duration(milliseconds: 500), () {
+            setState(() {
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (_) => const Home()));
+            });
           });
         } else {
           _showToast("Host Unreachable, try again later");

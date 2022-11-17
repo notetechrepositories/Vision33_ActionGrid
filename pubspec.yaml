@@ -66,6 +66,9 @@ flutter:
   uses-material-design: true
   assets:
      - assests/data.json
+     - assests/images/Saltbox_icon.png
+     - assests/images/Saltbox_title.png
+     
      
 
   
