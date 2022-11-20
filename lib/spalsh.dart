@@ -1,11 +1,13 @@
-import 'package:actiongrid/Utilis.dart';
+import 'package:actiongrid/Utilities/Internetcheck.dart';
 import 'package:actiongrid/Utilities/Models/model.dart';
 import 'package:actiongrid/constants.dart';
 import 'package:actiongrid/home.dart';
-import 'package:actiongrid/shared_preference_util.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'Utilities/shared_preference_util.dart';
 
 class Splash extends StatefulWidget {
   static final valueKey = ValueKey('Splash');

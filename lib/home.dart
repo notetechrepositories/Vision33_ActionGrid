@@ -1,13 +1,14 @@
 // ignore: implementation_imports
-import 'package:actiongrid/Utilis.dart';
+
+import 'package:actiongrid/Utilities/Internetcheck.dart';
 import 'package:actiongrid/editreport.dart';
-import 'package:actiongrid/report.dart';
-import 'package:actiongrid/shared_preference_util.dart';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'Utilities/Models/model.dart';
+import 'Utilities/shared_preference_util.dart';
 import 'constants.dart';
 
 class Home extends StatefulWidget {
@@ -74,14 +75,6 @@ class _HomeState extends State<Home> {
                                 List<Headers> headers = columns
                                     .map((job) => Headers.fromJson(job))
                                     .toList();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => Reportpage(
-                                              title: reports[index].reportName,
-                                              id: reports[index].id.toString(),
-                                              headers: headers,
-                                            )));
                               }
                             }, onError: (e) {});
                           },
