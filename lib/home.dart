@@ -2,6 +2,7 @@
 
 import 'package:actiongrid/Utilities/Internetcheck.dart';
 import 'package:actiongrid/editreport.dart';
+import 'package:actiongrid/reportpage.dart';
 
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -75,6 +76,14 @@ class _HomeState extends State<Home> {
                                 List<Headers> headers = columns
                                     .map((job) => Headers.fromJson(job))
                                     .toList();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => Reportpage(
+                                              title: reports[index].reportName,
+                                              id: reports[index].id.toString(),
+                                              headers: headers,
+                                            )));
                               }
                             }, onError: (e) {});
                           },
