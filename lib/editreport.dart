@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'constants.dart';
+import 'package:intl/intl.dart';
 
 class Editreport extends StatefulWidget {
   List<Headers> headers;
@@ -20,12 +21,14 @@ class Editreport extends StatefulWidget {
 
 class _EditreportState extends State<Editreport> {
   Map<String, String> selectedData = {"": ""};
+  TextEditingController dateController = TextEditingController();
   @override
   void initState() {
     // TODO: implement initState
     if (widget.headers != null) {
       for (Headers header in widget.headers) {
         Map dataMap = widget.orderData!.toJson();
+        print(header.format!);
         selectedData[header.column!] = dataMap[header.column!];
       }
     }
@@ -102,14 +105,14 @@ class _EditreportState extends State<Editreport> {
         String value = selectedData[widget.headers[i].column!] ?? "";
         if (widget.headers[i].format == "string" &&
             widget.headers[i].dropdown! == false) {
-          listings.add(getTextField(value));
+          listings.add(getTextField(widget.headers[i].column!));
         } else if (widget.headers[i].format == "string" &&
             widget.headers[i].dropdown!) {
           listings.add(getDropdown(
               widget.headers[i].column!, widget.headers[i].values!));
-          //listings.add(getDropdown(widget.headers[i].column!, widget.headers[i].values!));
+        } else if (widget.headers[i].format == "date") {
+          listings.add(getdateTextField(widget.headers[i].column!));
         }
-
         listings.add(
           const SizedBox(
             height: 15,
@@ -157,7 +160,7 @@ class _EditreportState extends State<Editreport> {
 
   Widget getTextField(String field) {
     return TextFormField(
-      initialValue: field,
+      initialValue: selectedData[field],
       onChanged: (text) {},
       decoration: InputDecoration(
           border: OutlineInputBorder(
@@ -180,15 +183,20 @@ class _EditreportState extends State<Editreport> {
     if (picked != null) {
       dateTime = picked;
       //assign the chosen date to the controller
-
+      final DateFormat formatter = DateFormat('yyyy-MM-dd');
+      final String formatted = formatter.format(dateTime);
+      dateController.text = formatted;
     }
   }
 
   Widget getdateTextField(String field) {
+    dateController.text = selectedData[field] ?? "";
     return TextFormField(
-      initialValue: field,
       onTap: _selectDate,
-      onChanged: (text) {},
+      controller: dateController,
+      onChanged: (text) {
+        selectedData[field] = text;
+      },
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
