@@ -1,6 +1,8 @@
 import 'package:actiongrid/Utilities/Internetcheck.dart';
 import 'package:actiongrid/Utilities/Models/model.dart';
+import 'package:actiongrid/Utilities/shared_preference_util.dart';
 import 'package:actiongrid/constants.dart';
+import 'package:actiongrid/editreport.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' as rootBundle;
@@ -110,7 +112,28 @@ class _ReportpageState extends State<Reportpage> {
                                       child: Icon(Icons.delete),
                                     ))),
                             GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  Future<String> accesspoint =
+                                      Preference.getStringItem(
+                                          Constants.column_data);
+                                  accesspoint.then((data) async {
+                                    if (data.isNotEmpty) {
+                                      List columns = json.decode(data);
+                                      List<Headers> headers = columns
+                                          .map((job) => Headers.fromJson(job))
+                                          .toList();
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) => Editreport(
+                                                    orderData:
+                                                        reports![rowIndex],
+                                                    title: widget.title,
+                                                    headers: headers,
+                                                  )));
+                                    }
+                                  }, onError: (e) {});
+                                },
                                 child: Container(
                                     width: 100,
                                     color: Colors.greenAccent,

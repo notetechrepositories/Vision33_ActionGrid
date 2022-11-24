@@ -1,5 +1,4 @@
 import 'package:actiongrid/Utilities/Models/model.dart';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -7,15 +6,33 @@ import 'constants.dart';
 
 class Editreport extends StatefulWidget {
   List<Headers> headers;
+  Tabledata? orderData;
   String? title;
-  Editreport({super.key, required this.title, required this.headers});
+  Editreport(
+      {super.key,
+      required this.orderData,
+      required this.title,
+      required this.headers});
 
   @override
   State<Editreport> createState() => _EditreportState();
 }
 
 class _EditreportState extends State<Editreport> {
-  Map<String, dynamic>? selectedData;
+  Map<String, String> selectedData = {"": ""};
+  @override
+  void initState() {
+    // TODO: implement initState
+    if (widget.headers != null) {
+      for (Headers header in widget.headers) {
+        Map dataMap = widget.orderData!.toJson();
+        selectedData[header.column!] = dataMap[header.column!];
+      }
+    }
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,43 +98,27 @@ class _EditreportState extends State<Editreport> {
     List<Widget> listings = <Widget>[];
 
     for (int i = 0; i < widget.headers.length; i++) {
-      if (widget.headers[i].format == "string" &&
-          widget.headers[i].dropdown! == false) {
-        listings.add(getTextField(widget.headers[i].column!));
-      } else if (widget.headers[i].format == "string" &&
-          widget.headers[i].dropdown!) {
-        listings.add(
-            getDropdown(widget.headers[i].column!, widget.headers[i].values!));
-        //listings.add(getDropdown(widget.headers[i].column!, widget.headers[i].values!));
-      }
+      if (widget.headers[i].column != "OrderID") {
+        String value = selectedData[widget.headers[i].column!] ?? "";
+        if (widget.headers[i].format == "string" &&
+            widget.headers[i].dropdown! == false) {
+          listings.add(getTextField(value));
+        } else if (widget.headers[i].format == "string" &&
+            widget.headers[i].dropdown!) {
+          listings.add(getDropdown(
+              widget.headers[i].column!, widget.headers[i].values!));
+          //listings.add(getDropdown(widget.headers[i].column!, widget.headers[i].values!));
+        }
 
-      listings.add(
-        const SizedBox(
-          height: 15,
-        ),
-      );
+        listings.add(
+          const SizedBox(
+            height: 15,
+          ),
+        );
+      }
     }
     return listings;
   }
-
-  // List<Widget> listings = <Widget>[];
-  // listings.add(getTextField("Order ID"));
-  // listings.add(
-  //   const SizedBox(
-  //     height: 15,
-  //   ),
-  // );
-
-  // listings.add(
-  //   getDropdown("Order Date", ["data"]),
-  // );
-  // listings.add(
-  //   const SizedBox(
-  //     height: 15,
-  //   ),
-  // );
-  // listings.add(getdateTextField("Order Date"));
-  // return listings;
 
   Widget getDropdown(String field, List<String> values) {
     return DropdownButtonFormField(

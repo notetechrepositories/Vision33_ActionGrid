@@ -95,6 +95,11 @@ class _HomeState extends State<Home> {
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(3, 5, 3, 5),
                               child: ListTile(
+                                trailing: InkWell(
+                                    onTap: () {
+                                      deleteData(reports[index].id.toString());
+                                    },
+                                    child: Icon(Icons.delete)),
                                 title: Text(
                                   reports[index].reportName ?? "",
                                   style: const TextStyle(
@@ -259,6 +264,36 @@ class _HomeState extends State<Home> {
         } else {
           _showToast("Host Unreachable, try again later");
         }
+      } else {
+        _showToast("No internet connection available");
+      }
+    });
+  }
+
+  deleteData(String reportID) async {
+    Utils.checkInternetConnection().then((connectionResult) async {
+      if (connectionResult) {
+        setState(() {
+          _isLoading = true;
+        });
+
+        String url = Constants.base_url + 'data/delete/${reportID}';
+
+        var uri = Uri.parse(url);
+
+        final response = await http.delete(
+          uri,
+          headers: <String, String>{
+            'Content-Type': "application/json",
+          },
+        );
+
+        if (response.statusCode == 200) {
+          _showToast("Deleted Successfully");
+        } else {
+          _showToast("Host Unreachable, try again later");
+        }
+        getreportlist();
       } else {
         _showToast("No internet connection available");
       }
