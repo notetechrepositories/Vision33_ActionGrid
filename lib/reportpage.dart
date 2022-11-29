@@ -14,11 +14,16 @@ import 'package:http/http.dart' as http;
 class Reportpage extends StatefulWidget {
   String? title;
   String? id;
+  String? databaseid;
   List<Headers>? headers;
 
   /// Creates the home page.
   Reportpage(
-      {Key? key, required this.title, required this.id, required this.headers})
+      {Key? key,
+      required this.title,
+      required this.id,
+      required this.headers,
+      required this.databaseid})
       : super(key: key);
 
   @override
@@ -169,8 +174,8 @@ class _ReportpageState extends State<Reportpage> {
           _isLoading = true;
         });
 
-        String url =
-            Constants.base_url + 'data/select_report_data?Id=${widget.id}';
+        String url = Constants.base_url +
+            'data/select_report_data?dbNo=${widget.databaseid}&Id=${widget.id}';
 
         var uri = Uri.parse(url);
 
@@ -206,7 +211,8 @@ class _ReportpageState extends State<Reportpage> {
           _isLoading = true;
         });
 
-        String url = Constants.base_url + 'data/delete/${widget.id}/${orderID}';
+        String url = Constants.base_url +
+            'data/delete/${widget.id}/${orderID}?dbNo=${widget.databaseid}';
 
         var uri = Uri.parse(url);
 

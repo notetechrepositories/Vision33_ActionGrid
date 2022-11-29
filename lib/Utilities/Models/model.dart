@@ -25,19 +25,22 @@ class Headers {
 }
 
 class Reports {
-  int? id;
+  String? id;
   String? reportName;
+  String? databaseID;
 
   Reports({this.id, this.reportName});
 
   Reports.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = json['reportId'].toString();
     reportName = json['reportName'];
+    databaseID = json['databaseID'];
   }
 }
 
 class Tabledata {
   String? orderID;
+  String? reportID;
   String? itemType;
   String? region;
   String? salesChannel;
@@ -47,6 +50,7 @@ class Tabledata {
 
   Tabledata(
       {this.orderID,
+      this.reportID,
       this.itemType,
       this.region,
       this.salesChannel,
@@ -56,6 +60,7 @@ class Tabledata {
 
   Tabledata.fromJson(Map<String, dynamic> json) {
     orderID = json['OrderID'].toString();
+    reportID = json['ReportID'].toString();
     itemType = json['ItemType'];
     region = json['Region'];
     salesChannel = json['SalesChannel'];

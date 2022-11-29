@@ -83,6 +83,8 @@ class _HomeState extends State<Home> {
                                               title: reports[index].reportName,
                                               id: reports[index].id.toString(),
                                               headers: headers,
+                                              databaseid:
+                                                  reports[index].databaseID,
                                             )));
                               }
                             }, onError: (e) {});
@@ -97,7 +99,8 @@ class _HomeState extends State<Home> {
                               child: ListTile(
                                 trailing: InkWell(
                                     onTap: () {
-                                      deleteData(reports[index].id.toString());
+                                      deleteData(reports[index].id.toString(),
+                                          reports[index].databaseID!);
                                     },
                                     child: Icon(Icons.delete)),
                                 title: Text(
@@ -148,7 +151,7 @@ class _HomeState extends State<Home> {
                 style: TextStyle(fontSize: 24.0, color: Color(0xFFaa0e3f)),
               ),
               content: SizedBox(
-                height: 220,
+                height: 260,
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -184,6 +187,39 @@ class _HomeState extends State<Home> {
                               hintText: 'Enter name here',
                               labelText: 'Name'),
                         ),
+                      ),
+                      DropdownButtonFormField(
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.grey, width: 0.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(0.0),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                              ),
+                            ),
+                            hintStyle: TextStyle(color: Color(0xFF047CB7)),
+                            filled: true,
+                            fillColor: Colors.white,
+                            counterText: "",
+                            labelText: "",
+                            labelStyle: TextStyle(color: Color(0xFF047CB7)),
+                            hintText: "field"),
+                        value: "data1",
+                        items: ["data1", "data2"]
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(
+                            () {},
+                          );
+                        },
                       ),
                       Container(
                         width: double.infinity,
@@ -270,14 +306,15 @@ class _HomeState extends State<Home> {
     });
   }
 
-  deleteData(String reportID) async {
+  deleteData(String reportID, String databaseID) async {
     Utils.checkInternetConnection().then((connectionResult) async {
       if (connectionResult) {
         setState(() {
           _isLoading = true;
         });
 
-        String url = Constants.base_url + 'data/delete/${reportID}';
+        String url =
+            Constants.base_url + 'data/delete/${reportID}?dbNo=${databaseID}';
 
         var uri = Uri.parse(url);
 
@@ -290,10 +327,10 @@ class _HomeState extends State<Home> {
 
         if (response.statusCode == 200) {
           _showToast("Deleted Successfully");
+          getreportlist();
         } else {
           _showToast("Host Unreachable, try again later");
         }
-        getreportlist();
       } else {
         _showToast("No internet connection available");
       }
