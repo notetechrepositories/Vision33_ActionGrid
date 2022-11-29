@@ -75,7 +75,9 @@ class _EditreportState extends State<Editreport> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            print(selectedData);
+                          },
                         ),
                       ),
                     ),
@@ -152,7 +154,9 @@ class _EditreportState extends State<Editreport> {
       }).toList(),
       onChanged: (val) {
         setState(
-          () {},
+          () {
+            selectedData[field] = val!;
+          },
         );
       },
     );
@@ -161,7 +165,9 @@ class _EditreportState extends State<Editreport> {
   Widget getTextField(String field) {
     return TextFormField(
       initialValue: selectedData[field],
-      onChanged: (text) {},
+      onChanged: (text) {
+        selectedData[field] = text;
+      },
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),

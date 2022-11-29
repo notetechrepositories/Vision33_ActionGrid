@@ -22,6 +22,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool _isLoading = false;
   bool _isapply = false;
+  String _selecteConnection = "Connection 1";
   List<Reports> reports = [];
   final _submitfieldControler = TextEditingController();
   bool error = false;
@@ -151,7 +152,7 @@ class _HomeState extends State<Home> {
                 style: TextStyle(fontSize: 24.0, color: Color(0xFFaa0e3f)),
               ),
               content: SizedBox(
-                height: 260,
+                height: 300,
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -188,38 +189,47 @@ class _HomeState extends State<Home> {
                               labelText: 'Name'),
                         ),
                       ),
-                      DropdownButtonFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.grey, width: 0.0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(0.0),
-                              borderSide: BorderSide(
-                                color: Colors.grey,
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DropdownButtonFormField(
+                          decoration: InputDecoration(
+                              border: const OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.red, width: 0.0),
                               ),
-                            ),
-                            hintStyle: TextStyle(color: Color(0xFF047CB7)),
-                            filled: true,
-                            fillColor: Colors.white,
-                            counterText: "",
-                            labelText: "",
-                            labelStyle: TextStyle(color: Color(0xFF047CB7)),
-                            hintText: "field"),
-                        value: "data1",
-                        items: ["data1", "data2"]
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          setState(
-                            () {},
-                          );
-                        },
+                              focusedBorder: const OutlineInputBorder(),
+                              hintStyle: TextStyle(color: Color(0xFF047CB7)),
+                              filled: true,
+                              fillColor: Colors.white,
+                              counterText: "",
+                              labelText: "",
+                              labelStyle: TextStyle(color: Color(0xFF047CB7)),
+                              hintText: "field"),
+                          value: _selecteConnection,
+                          items: [
+                            "Connection 1",
+                            "Connection 2",
+                            "Connection 3"
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(
+                              () {
+                                _selecteConnection = val!;
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
                       ),
                       Container(
                         width: double.infinity,
@@ -240,8 +250,22 @@ class _HomeState extends State<Home> {
                                     });
                                   } else {
                                     setState(() {
-                                      createReport(
-                                          _submitfieldControler.text, context);
+                                      if (!_selecteConnection.isEmpty) {
+                                        String connection = "1";
+                                        if (_selecteConnection ==
+                                            "Connection 1") {
+                                          connection = "1";
+                                        } else if (_selecteConnection ==
+                                            "Connection 2") {
+                                          connection = "2";
+                                        }
+                                        if (_selecteConnection ==
+                                            "Connection 3") {
+                                          connection = "3";
+                                        }
+                                        createReport(_submitfieldControler.text,
+                                            connection, context);
+                                      }
                                     });
                                   }
                                 },
@@ -337,14 +361,16 @@ class _HomeState extends State<Home> {
     });
   }
 
-  createReport(String reportname, BuildContext context) async {
+  createReport(
+      String reportname, String connection, BuildContext context) async {
     Utils.checkInternetConnection().then((connectionResult) async {
       if (connectionResult) {
         setState(() {
           _isapply = true;
         });
 
-        String url = Constants.base_url + 'create_report/add_new';
+        String url =
+            Constants.base_url + 'create_report/add_new?dbNo=${connection}';
 
         var uri = Uri.parse(url);
         Map report = {"reportName": reportname};
