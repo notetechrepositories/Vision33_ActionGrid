@@ -5,6 +5,7 @@ import 'package:actiongrid/editreport.dart';
 import 'package:actiongrid/reportpage.dart';
 
 import 'package:flutter/material.dart';
+import 'package:focus_detector/focus_detector.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -22,121 +23,140 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool _isLoading = false;
   bool _isapply = false;
+  bool _nodata = false;
   String _selecteConnection = "Connection 1";
   List<Reports> reports = [];
   final _submitfieldControler = TextEditingController();
   bool error = false;
+
   @override
   void initState() {
     super.initState();
-    getreportlist();
+    //getreportlist();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xFFaa0e3f),
-        onPressed: () {
-          howDataAlert();
-        },
-        child: const Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Image.asset(
-          "assests/images/Saltbox_title.png",
-          height: 50,
-          width: 100,
-          fit: BoxFit.contain,
+    return FocusDetector(
+      onFocusGained: () {
+        print("View will appear");
+        getreportlist();
+      },
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Color(0xFFaa0e3f),
+          onPressed: () {
+            howDataAlert();
+          },
+          child: const Icon(Icons.add),
         ),
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFaa0e3f),
-              ),
-            )
-          : Container(
-              color: const Color(0xFFD3D3D3),
-              height: MediaQuery.of(context).size.height,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                  child: ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            Future<String> accesspoint =
-                                Preference.getStringItem(Constants.column_data);
-                            accesspoint.then((data) async {
-                              if (data.isNotEmpty) {
-                                List columns = json.decode(data);
-                                List<Headers> headers = columns
-                                    .map((job) => Headers.fromJson(job))
-                                    .toList();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => Reportpage(
-                                              title: reports[index].reportName,
-                                              id: reports[index].id.toString(),
-                                              headers: headers,
-                                              databaseid:
-                                                  reports[index].databaseID,
-                                            )));
-                              }
-                            }, onError: (e) {});
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(3, 5, 3, 5),
-                              child: ListTile(
-                                trailing: InkWell(
-                                    onTap: () {
-                                      deleteData(reports[index].id.toString(),
-                                          reports[index].databaseID!);
-                                    },
-                                    child: Icon(Icons.delete)),
-                                title: Text(
-                                  reports[index].reportName ?? "",
-                                  style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return const Divider(
-                          height: 5,
-                          color: Colors.transparent,
-                        );
-                      },
-                      itemCount: reports.length),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Image.asset(
+            "assests/images/Saltbox_title.png",
+            height: 50,
+            width: 100,
+            fit: BoxFit.contain,
+          ),
+        ),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFFaa0e3f),
                 ),
+              )
+            : Container(
+                color: const Color(0xFFD3D3D3),
+                height: MediaQuery.of(context).size.height,
+                child: _nodata
+                    ? const Center(child: Text("No reports found"))
+                    : Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                          child: ListView.separated(
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return InkWell(
+                                  onTap: () {
+                                    Future<String> accesspoint =
+                                        Preference.getStringItem(
+                                            Constants.column_data);
+                                    accesspoint.then((data) async {
+                                      if (data.isNotEmpty) {
+                                        List columns = json.decode(data);
+                                        List<Headers> headers = columns
+                                            .map((job) => Headers.fromJson(job))
+                                            .toList();
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) => Reportpage(
+                                                      title: reports[index]
+                                                          .reportName,
+                                                      id: reports[index]
+                                                          .id
+                                                          .toString(),
+                                                      headers: headers,
+                                                      databaseid: reports[index]
+                                                          .databaseID,
+                                                    )));
+                                      }
+                                    }, onError: (e) {});
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(3, 5, 3, 5),
+                                      child: ListTile(
+                                        trailing: InkWell(
+                                            onTap: () {
+                                              deleteData(
+                                                  reports[index].id.toString(),
+                                                  reports[index].databaseID!);
+                                            },
+                                            child: Icon(Icons.delete)),
+                                        title: Text(
+                                          reports[index].reportName ?? "",
+                                          style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              separatorBuilder: (context, index) {
+                                return const Divider(
+                                  height: 5,
+                                  color: Colors.transparent,
+                                );
+                              },
+                              itemCount: reports.length),
+                        ),
+                      ),
               ),
-            ),
+      ),
     );
   }
 
   howDataAlert() {
     error = false;
     _submitfieldControler.text = "";
+    final FocusNode unitCodeCtrlFocusNode = FocusNode();
+    unitCodeCtrlFocusNode.requestFocus();
     showDialog(
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: ((context, setState) {
             return AlertDialog(
+              scrollable: true,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(
@@ -145,14 +165,14 @@ class _HomeState extends State<Home> {
                 ),
               ),
               contentPadding: const EdgeInsets.only(
-                top: 10.0,
+                top: 13.0,
               ),
               title: const Text(
                 "Create Report",
                 style: TextStyle(fontSize: 24.0, color: Color(0xFFaa0e3f)),
               ),
               content: SizedBox(
-                height: 300,
+                height: 330,
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -177,14 +197,18 @@ class _HomeState extends State<Home> {
                               });
                             }
                           },
+                          focusNode: unitCodeCtrlFocusNode,
                           decoration: InputDecoration(
                               errorText:
                                   error ? "Please enter report name" : null,
                               enabledBorder: const OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: Colors.grey, width: 0.0),
+                                    BorderSide(color: Colors.grey, width: 1.0),
                               ),
-                              border: const OutlineInputBorder(),
+                              border: const OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 1.0),
+                              ),
                               hintText: 'Enter name here',
                               labelText: 'Name'),
                         ),
@@ -228,56 +252,57 @@ class _HomeState extends State<Home> {
                           },
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Container(
                         width: double.infinity,
                         height: 60,
                         padding: const EdgeInsets.all(8.0),
-                        child: _isapply
-                            ? const Center(
-                                child: CircularProgressIndicator(
-                                  color: Color(0xFF047CB7),
-                                ),
-                              )
-                            : ElevatedButton(
-                                onPressed: () {
-                                  if (_submitfieldControler.text.isEmpty) {
-                                    setState(() {
-                                      print("true");
-                                      error = true;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      if (!_selecteConnection.isEmpty) {
-                                        String connection = "1";
-                                        if (_selecteConnection ==
-                                            "Connection 1") {
-                                          connection = "1";
-                                        } else if (_selecteConnection ==
-                                            "Connection 2") {
-                                          connection = "2";
-                                        }
-                                        if (_selecteConnection ==
-                                            "Connection 3") {
-                                          connection = "3";
-                                        }
-                                        createReport(_submitfieldControler.text,
-                                            connection, context);
-                                      }
-                                    });
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_submitfieldControler.text.isEmpty) {
+                              setState(() {
+                                print("true");
+                                error = true;
+                              });
+                            } else {
+                              setState(() {
+                                if (!_selecteConnection.isEmpty) {
+                                  String connection = "1";
+                                  if (_selecteConnection == "Connection 1") {
+                                    connection = "1";
+                                  } else if (_selecteConnection ==
+                                      "Connection 2") {
+                                    connection = "2";
                                   }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color(0xFF047CB7),
-                                ),
-                                child: const Text("Submit",
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold)),
-                              ),
+                                  if (_selecteConnection == "Connection 3") {
+                                    connection = "3";
+                                  }
+                                  setState(() {
+                                    createReport(_submitfieldControler.text,
+                                        connection, context);
+                                  });
+                                }
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Color(0xFF047CB7),
+                          ),
+                          child: const Text("Submit",
+                              style: TextStyle(
+                                  fontSize: 18.0, fontWeight: FontWeight.bold)),
+                        ),
                       ),
+                      Visibility(
+                        visible: _isapply,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF047CB7),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -321,6 +346,11 @@ class _HomeState extends State<Home> {
         if (response.statusCode == 200) {
           List parsed = json.decode(response.body);
           reports = parsed.map((job) => Reports.fromJson(job)).toList();
+          if (reports.length == 0) {
+            _nodata = true;
+          } else {
+            _nodata = false;
+          }
         } else {
           _showToast("Host Unreachable, try again later");
         }

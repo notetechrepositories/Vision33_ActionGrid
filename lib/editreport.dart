@@ -1,3 +1,4 @@
+import 'package:actiongrid/Utilities/Internetcheck.dart';
 import 'package:actiongrid/Utilities/Models/model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -8,12 +9,14 @@ import 'package:intl/intl.dart';
 class Editreport extends StatefulWidget {
   List<Headers> headers;
   Tabledata? orderData;
+  String? databaseID;
   String? title;
   Editreport(
       {super.key,
       required this.orderData,
       required this.title,
-      required this.headers});
+      required this.headers,
+      required this.databaseID});
 
   @override
   State<Editreport> createState() => _EditreportState();
@@ -21,6 +24,7 @@ class Editreport extends StatefulWidget {
 
 class _EditreportState extends State<Editreport> {
   Map<String, String> selectedData = {"": ""};
+  bool _isapply = false;
   TextEditingController dateController = TextEditingController();
   @override
   void initState() {
@@ -55,46 +59,68 @@ class _EditreportState extends State<Editreport> {
             ),
             Positioned(
                 bottom: 0,
-                child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 130,
-                    child: Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Color(0xFFaa0e3f),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(30.0),
-                            )),
-                        height: 60,
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        child: TextButton(
-                          child: Text(
-                            "Update",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold),
+                child: _isapply
+                    ? CircularProgressIndicator(
+                        color: Color(0xff047CB7),
+                      )
+                    : Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 130,
+                        child: Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color(0xFFaa0e3f),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30.0),
+                                )),
+                            height: 60,
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            child: TextButton(
+                              child: Text(
+                                "Update",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              onPressed: () {
+                                selectedData["OrderDate"] = dateController.text;
+
+                                if (selectedData["OrderPriority"]!.isEmpty) {
+                                  _showToast("Please enter data");
+                                } else {
+                                  var map = {
+                                    "OrderID": widget.orderData!.orderID,
+                                    "ReportID": widget.orderData!.reportID,
+                                    "ItemType": selectedData["ItemType"],
+                                    "SalesChannel":
+                                        selectedData["SalesChannel"],
+                                    "Country": selectedData["Country"],
+                                    "OrderPriority":
+                                        selectedData["OrderPriority"],
+                                    "OrderDate": selectedData["OrderDate"]
+                                  };
+                                  print(map);
+                                  update(map);
+                                }
+                              },
+                            ),
                           ),
-                          onPressed: () {
-                            print(selectedData);
-                          },
                         ),
-                      ),
-                    ),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15.0),
-                          topRight: Radius.circular(15.0)),
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, -2),
-                          blurRadius: 2,
-                          spreadRadius: 0,
-                          color: Colors.grey,
-                        ),
-                      ],
-                    )))
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15.0),
+                              topRight: Radius.circular(15.0)),
+                          boxShadow: [
+                            BoxShadow(
+                              offset: Offset(0, -2),
+                              blurRadius: 2,
+                              spreadRadius: 0,
+                              color: Colors.grey,
+                            ),
+                          ],
+                        )))
           ],
         ));
   }
@@ -145,7 +171,7 @@ class _EditreportState extends State<Editreport> {
           labelText: field,
           labelStyle: TextStyle(color: Color(0xFF047CB7)),
           hintText: field),
-      value: values[0],
+      value: selectedData[field],
       items: values.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
@@ -192,6 +218,7 @@ class _EditreportState extends State<Editreport> {
       final DateFormat formatter = DateFormat('yyyy-MM-dd');
       final String formatted = formatter.format(dateTime);
       dateController.text = formatted;
+      selectedData["OrderDate"] = formatted;
     }
   }
 
@@ -211,5 +238,55 @@ class _EditreportState extends State<Editreport> {
           hintText: field,
           labelText: field),
     );
+  }
+
+  void _showToast(String msg) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        duration: Duration(milliseconds: 2000),
+        content: Text(msg),
+      ),
+    );
+  }
+
+//api
+  update(Map dict) async {
+    Utils.checkInternetConnection().then((connectionResult) async {
+      if (connectionResult) {
+        setState(() {
+          _isapply = true;
+        });
+
+        String url = Constants.base_url +
+            'data/update?dbNo=${widget.databaseID}&reportId=${widget.orderData!.reportID}&orderId=${widget.orderData!.orderID}';
+
+        var uri = Uri.parse(url);
+        print(uri);
+
+        var body = jsonEncode(dict);
+        final response = await http.put(uri,
+            headers: <String, String>{
+              'Content-Type': "application/json",
+            },
+            body: body);
+        setState(() {});
+        print(response.statusCode);
+        if (response.statusCode == 200) {
+          _showToast("Report updated successfully");
+
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _isapply = false;
+            setState(() {
+              Navigator.of(context).pop();
+            });
+          });
+        } else {
+          _showToast("Host Unreachable, try again later");
+        }
+      } else {
+        _showToast("No internet connection available");
+      }
+    });
   }
 }

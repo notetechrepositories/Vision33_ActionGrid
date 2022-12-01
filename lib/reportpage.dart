@@ -3,6 +3,7 @@ import 'package:actiongrid/Utilities/Models/model.dart';
 import 'package:actiongrid/Utilities/shared_preference_util.dart';
 import 'package:actiongrid/constants.dart';
 import 'package:actiongrid/editreport.dart';
+import 'package:focus_detector/focus_detector.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' as rootBundle;
@@ -39,7 +40,7 @@ class _ReportpageState extends State<Reportpage> {
   @override
   void initState() {
     setState(() {
-      getData();
+      //getData();
     });
   }
 
@@ -66,102 +67,111 @@ class _ReportpageState extends State<Reportpage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title!),
-      ),
-      body: SafeArea(
-        bottom: true,
-        left: false,
-        right: false,
-        child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                color: Color(0xff047CB7),
-              ))
-            : Stack(
-                children: [
-                  SfDataGridTheme(
-                    data: SfDataGridThemeData(
-                        headerColor: const Color(0xffe5f1f7),
-                        rowHoverColor: Colors.yellow,
-                        rowHoverTextStyle: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                        )),
-                    child: SfDataGrid(
-                      gridLinesVisibility: GridLinesVisibility.both,
-                      headerGridLinesVisibility: GridLinesVisibility.both,
-                      allowSorting: true,
-                      allowSwiping: true,
-                      onQueryRowHeight: (details) {
-                        return details.getIntrinsicRowHeight(details.rowIndex);
-                      },
-                      source: reportDataSource,
-                      startSwipeActionsBuilder: (BuildContext context,
-                          DataGridRow row, int rowIndex) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  if (reports != null) {
-                                    deleteData(reports![rowIndex].orderID!);
-                                  }
-                                },
-                                child: Container(
-                                    width: 100,
-                                    color: Colors.redAccent,
-                                    child: const Center(
-                                      child: Icon(Icons.delete),
-                                    ))),
-                            GestureDetector(
-                                onTap: () {
-                                  Future<String> accesspoint =
-                                      Preference.getStringItem(
-                                          Constants.column_data);
-                                  accesspoint.then((data) async {
-                                    if (data.isNotEmpty) {
-                                      List columns = json.decode(data);
-                                      List<Headers> headers = columns
-                                          .map((job) => Headers.fromJson(job))
-                                          .toList();
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (_) => Editreport(
-                                                    orderData:
-                                                        reports![rowIndex],
-                                                    title: widget.title,
-                                                    headers: headers,
-                                                  )));
+    return FocusDetector(
+      onFocusGained: () {
+        print("View will appear");
+        getData();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title!),
+        ),
+        body: SafeArea(
+          bottom: true,
+          left: false,
+          right: false,
+          child: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                  color: Color(0xff047CB7),
+                ))
+              : Stack(
+                  children: [
+                    SfDataGridTheme(
+                      data: SfDataGridThemeData(
+                          headerColor: const Color(0xffe5f1f7),
+                          rowHoverColor: Colors.yellow,
+                          rowHoverTextStyle: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                          )),
+                      child: SfDataGrid(
+                        gridLinesVisibility: GridLinesVisibility.both,
+                        headerGridLinesVisibility: GridLinesVisibility.both,
+                        allowSorting: true,
+                        allowSwiping: true,
+                        onQueryRowHeight: (details) {
+                          return details
+                              .getIntrinsicRowHeight(details.rowIndex);
+                        },
+                        source: reportDataSource,
+                        startSwipeActionsBuilder: (BuildContext context,
+                            DataGridRow row, int rowIndex) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                  onTap: () {
+                                    if (reports != null) {
+                                      deleteData(reports![rowIndex].orderID!);
                                     }
-                                  }, onError: (e) {});
-                                },
-                                child: Container(
-                                    width: 100,
-                                    color: Colors.greenAccent,
-                                    child: const Center(
-                                      child: Icon(Icons.edit),
-                                    ))),
-                          ],
-                        );
-                      },
-                      onSwipeStart: (data) {
-                        if (data.swipeDirection ==
-                            DataGridRowSwipeDirection.startToEnd) {
-                          return true;
-                        }
-                        return false;
-                      },
-                      onCellTap: (details) {},
-                      columnWidthMode: ColumnWidthMode.fitByCellValue,
-                      columns: createColumns(),
+                                  },
+                                  child: Container(
+                                      width: 100,
+                                      color: Colors.redAccent,
+                                      child: const Center(
+                                        child: Icon(Icons.delete),
+                                      ))),
+                              GestureDetector(
+                                  onTap: () {
+                                    Future<String> accesspoint =
+                                        Preference.getStringItem(
+                                            Constants.column_data);
+                                    accesspoint.then((data) async {
+                                      if (data.isNotEmpty) {
+                                        List columns = json.decode(data);
+                                        List<Headers> headers = columns
+                                            .map((job) => Headers.fromJson(job))
+                                            .toList();
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) => Editreport(
+                                                      orderData:
+                                                          reports![rowIndex],
+                                                      title: widget.title,
+                                                      headers: headers,
+                                                      databaseID:
+                                                          widget.databaseid,
+                                                    )));
+                                      }
+                                    }, onError: (e) {});
+                                  },
+                                  child: Container(
+                                      width: 100,
+                                      color: Colors.greenAccent,
+                                      child: const Center(
+                                        child: Icon(Icons.edit),
+                                      ))),
+                            ],
+                          );
+                        },
+                        onSwipeStart: (data) {
+                          if (data.swipeDirection ==
+                              DataGridRowSwipeDirection.startToEnd) {
+                            return true;
+                          }
+                          return false;
+                        },
+                        onCellTap: (details) {},
+                        columnWidthMode: ColumnWidthMode.fitByCellValue,
+                        columns: createColumns(),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -212,7 +222,7 @@ class _ReportpageState extends State<Reportpage> {
         });
 
         String url = Constants.base_url +
-            'data/delete/${widget.id}/${orderID}?dbNo=${widget.databaseid}';
+            'data/delete/order?dbNo=${widget.databaseid}&reportId=${widget.id}&orderId=${orderID}';
 
         var uri = Uri.parse(url);
 
