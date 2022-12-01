@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'constants.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_overlay/loading_overlay.dart';
 
 class Editreport extends StatefulWidget {
   List<Headers> headers;
@@ -44,84 +45,87 @@ class _EditreportState extends State<Editreport> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text(widget.title!)),
-        body: Stack(
-          children: [
-            SizedBox(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(30, 30, 30, 15),
-                child: SingleChildScrollView(
-                    child: Column(
-                  children: _getListings(),
-                )),
+        body: LoadingOverlay(
+          isLoading: _isapply,
+          // demo of some additional parameters
+          opacity: 0.4,
+          progressIndicator: CircularProgressIndicator(
+            color: Color(0xff123456),
+          ),
+          child: Stack(
+            children: [
+              SizedBox(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(30, 30, 30, 15),
+                  child: SingleChildScrollView(
+                      child: Column(
+                    children: _getListings(),
+                  )),
+                ),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
               ),
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-            ),
-            Positioned(
-                bottom: 0,
-                child: _isapply
-                    ? CircularProgressIndicator(
-                        color: Color(0xff047CB7),
-                      )
-                    : Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 130,
-                        child: Center(
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Color(0xFFaa0e3f),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(30.0),
-                                )),
-                            height: 60,
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            child: TextButton(
-                              child: Text(
-                                "Update",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              onPressed: () {
-                                selectedData["OrderDate"] = dateController.text;
-
-                                if (selectedData["OrderPriority"]!.isEmpty) {
-                                  _showToast("Please enter data");
-                                } else {
-                                  var map = {
-                                    "OrderID": widget.orderData!.orderID,
-                                    "ReportID": widget.orderData!.reportID,
-                                    "ItemType": selectedData["ItemType"],
-                                    "SalesChannel":
-                                        selectedData["SalesChannel"],
-                                    "Country": selectedData["Country"],
-                                    "OrderPriority":
-                                        selectedData["OrderPriority"],
-                                    "OrderDate": selectedData["OrderDate"]
-                                  };
-                                  print(map);
-                                  update(map);
-                                }
-                              },
+              Positioned(
+                  bottom: 0,
+                  child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 130,
+                      child: Center(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Color(0xFFaa0e3f),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(30.0),
+                              )),
+                          height: 60,
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          child: TextButton(
+                            child: Text(
+                              "Update",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
                             ),
+                            onPressed: () {
+                              selectedData["OrderDate"] = dateController.text;
+
+                              if (selectedData["OrderPriority"]!.isEmpty) {
+                                _showToast("Please enter data");
+                              } else {
+                                var map = {
+                                  "OrderID": widget.orderData!.orderID,
+                                  "ReportID": widget.orderData!.reportID,
+                                  "ItemType": selectedData["ItemType"],
+                                  "SalesChannel": selectedData["SalesChannel"],
+                                  "Country": selectedData["Country"],
+                                  "OrderPriority":
+                                      selectedData["OrderPriority"],
+                                  "OrderDate": selectedData["OrderDate"]
+                                };
+                                print(map);
+                                update(map);
+                              }
+                            },
                           ),
                         ),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15.0),
-                              topRight: Radius.circular(15.0)),
-                          boxShadow: [
-                            BoxShadow(
-                              offset: Offset(0, -2),
-                              blurRadius: 2,
-                              spreadRadius: 0,
-                              color: Colors.grey,
-                            ),
-                          ],
-                        )))
-          ],
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15.0),
+                            topRight: Radius.circular(15.0)),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0, -2),
+                            blurRadius: 2,
+                            spreadRadius: 0,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      )))
+            ],
+          ),
         ));
   }
 
@@ -282,9 +286,11 @@ class _EditreportState extends State<Editreport> {
             });
           });
         } else {
+          _isapply = false;
           _showToast("Host Unreachable, try again later");
         }
       } else {
+        _isapply = false;
         _showToast("No internet connection available");
       }
     });
