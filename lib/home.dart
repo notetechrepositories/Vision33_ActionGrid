@@ -164,15 +164,17 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
-              contentPadding: const EdgeInsets.only(
-                top: 13.0,
+              contentPadding: const EdgeInsets.only(left: 20.0,right: 20.0,top: 20.0,
               ),
-              title: const Text(
-                "Create Report",
-                style: TextStyle(fontSize: 24.0, color: Color(0xFFaa0e3f)),
+              title: const Center(
+                child: Text(
+                  "Create Report",
+                  style: TextStyle(fontSize: 24.0, color: Color(0xFFaa0e3f)),
+                ),
               ),
               content: SizedBox(
                 height: 330,
+                width: MediaQuery.of(context).size.width,
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
