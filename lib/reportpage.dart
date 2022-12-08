@@ -70,11 +70,85 @@ class _ReportpageState extends State<Reportpage> {
     return FocusDetector(
       onFocusGained: () {
         print("View will appear");
-        getData();
+        getData("Clear");
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title!),
+          actions: [
+            PopupMenuButton(
+                icon: Icon(Icons.filter_alt_outlined),
+                color: Colors.white,
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem<int>(
+                      value: 0,
+                      child: Text("Bosnia and Herzegovina"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 1,
+                      child: Text("Estonia"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 2,
+                      child: Text("Germany"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 3,
+                      child: Text("Iceland"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 4,
+                      child: Text("Madagascar"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 5,
+                      child: Text("Malawi"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 6,
+                      child: Text("Montenegro"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 7,
+                      child: Text("Serbia"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 8,
+                      child: Text("Seychelles"),
+                    ),
+                    PopupMenuItem<int>(
+                      value: 9,
+                      child: Text("Clear"),
+                    )
+                  ];
+                },
+                onSelected: (value) {
+                  setState(() {
+                    if (value == 0) {
+                      getData("Bosnia and Herzegovina");
+                    } else if (value == 1) {
+                      getData("Estonia");
+                    } else if (value == 2) {
+                      getData("Germany");
+                    } else if (value == 3) {
+                      getData("Iceland");
+                    } else if (value == 4) {
+                      getData("Madagascar");
+                    } else if (value == 5) {
+                      getData("Malawi");
+                    } else if (value == 6) {
+                      getData("Montenegro");
+                    } else if (value == 7) {
+                      getData("Serbia");
+                    } else if (value == 8) {
+                      getData("Seychelles");
+                    } else if (value == 9) {
+                      getData("Clear");
+                    }
+                  });
+                }),
+          ],
         ),
         body: SafeArea(
           bottom: true,
@@ -177,7 +251,7 @@ class _ReportpageState extends State<Reportpage> {
   }
 
   //Api
-  getData() async {
+  getData(String value) async {
     Utils.checkInternetConnection().then((connectionResult) async {
       if (connectionResult) {
         setState(() {
@@ -185,7 +259,11 @@ class _ReportpageState extends State<Reportpage> {
         });
 
         String url = Constants.base_url +
-            'data/select_report_data?dbNo=${widget.databaseid}&Id=${widget.id}';
+            'data/getlist?dbNo=${widget.databaseid}&reportId=${widget.id}&value=${value}';
+        if (value == "Clear") {
+          url = Constants.base_url +
+              'data/select_report_data?dbNo=${widget.databaseid}&Id=${widget.id}';
+        }
 
         var uri = Uri.parse(url);
 
@@ -234,7 +312,7 @@ class _ReportpageState extends State<Reportpage> {
         );
 
         if (response.statusCode == 200) {
-          getData();
+          getData("Clear");
           _showToast("Deleted Successfully");
         } else {
           _showToast("Host Unreachable, try again later");

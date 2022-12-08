@@ -44,7 +44,11 @@ class _EditreportState extends State<Editreport> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(widget.title!)),
+        appBar: AppBar(
+          title: Text(
+            widget.title!,
+          ),
+        ),
         body: LoadingOverlay(
           isLoading: _isapply,
           // demo of some additional parameters
